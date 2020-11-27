@@ -21,10 +21,13 @@ class DatabaseSeeder extends Seeder
         //     'email' => Str::random(100).'@gmail.com',
         //     'password' => Hash::make('password'),
         // ]);
-        Utilisateur::factory(100)->create();
+        Utilisateur::factory(1000)->create();
         $this->call([
             RolesTableSeeder::class,
             UsersTableSeeder::class,
+            ]);
+        $this->call([
+            PostTableSeeder::class,
             ]);
         // \App\Models\User::factory(10)->create();
     }

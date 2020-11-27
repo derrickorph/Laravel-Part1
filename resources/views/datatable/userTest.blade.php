@@ -39,16 +39,16 @@
             $i=1;
             @endphp
             @foreach ($tests as $test)
-                <tr id="sid{{ $test->name }}">
-                    <td scope="row" ><?= $i++ ?></th>
-                    <td scope="row">{{ $test->name }}</td>
-                    <td scope="row">{{ $test->firstname }}</td>
-                    <td scope="row">{{ $test->email }}</td>
-                    <td scope="row">{{ $test->created_at }}</td>
-                    <td scope="row">{{ $test->updated_at }}</td>
+                <tr id="sid{{ $test->id }}">
+                    <td scope="row" ><?= $i++ ?></td>
+                    <td>{{ $test->name }}</td>
+                    <td>{{ $test->firstname }}</td>
+                    <td>{{ $test->email }}</td>
+                    <td>{{ $test->created_at }}</td>
+                    <td>{{ $test->updated_at }}</td>
                     <td class="text-center">
 
-                    <a href="javascript:void(0)" onclick="editionUser({{ $test->id }})" class="editUser btn btn-warning btn-sm ">Editer</a>
+                        <a href="javascript:void(0)" onclick="editionUser({{ $test->id }})" class="editUser btn btn-warning btn-sm ">Editer</a>
                         <a data-id='{{ $test->id }}'  class=" deleteUser btn btn-danger btn-sm">supprimer</a>
                     </td>
 
@@ -238,271 +238,248 @@
         </div>
     @endsection
     @section('js')
-                <script>
-                    function _(elmnt) {
-                        return document.getElementById(elmnt);
-                    }
-                   function uploadFichier() {
-                    var file= _('file').files[0];
-                    var data= new FormData();
-                    data.append('file',file);
+        <script>
+            function _(elmnt) {
+                return document.getElementById(elmnt);
+            }
+            function uploadFichier() {
+            var file= _('file').files[0];
+            var data= new FormData();
+            data.append('file',file);
 
-                    var ajax= new XMLHttpRequest();
-                    ajax.upload.addEventListener("progress",progressHandler,false);
-                    ajax.addEventListener("load",completeHandler,false);
-                    ajax.addEventListener("error",errorHandler,false);
-                    ajax.addEventListener("abort",abortHandler,false);
-                    ajax.open("post","/progress");
-                    ajax.send(data);
-                    // alert(file.name);
-                   }
-                   function progressHandler(event) {
-                        _('status_bytes').innerHTML= event.loaded + '  bytes uploaded by  '+ event.total;
-                         var pourcentage= (event.loaded / event.total)*100;
-                         _('progressBar').value= Math.round(pourcentage);
-                         _('status').innerHTML=Math.round(pourcentage)+' % uploaded... Patientez';
-                   }
-                   function completeHandler(event) {
+            var ajax= new XMLHttpRequest();
+            ajax.upload.addEventListener("progress",progressHandler,false);
+            ajax.addEventListener("load",completeHandler,false);
+            ajax.addEventListener("error",errorHandler,false);
+            ajax.addEventListener("abort",abortHandler,false);
+            ajax.open("post","/progress");
+            ajax.send(data);
+            // alert(file.name);
+            }
+            function progressHandler(event) {
+                _('status_bytes').innerHTML= event.loaded + '  bytes uploaded by  '+ event.total;
+                    var pourcentage= (event.loaded / event.total)*100;
+                    _('progressBar').value= Math.round(pourcentage);
+                    _('status').innerHTML=Math.round(pourcentage)+' % uploaded... Patientez';
+            }
+            function completeHandler(event) {
 
-                    _('status').innerHTML= event.target.responseText;
-                    _('progressBar').value= 0;
+            _('status').innerHTML= event.target.responseText;
+            _('progressBar').value= 0;
 
-                    }
-                    function errorHandler() {
-                        _('status').innerHTML="Chargement échoué";
-                    }
-                    function abortHandler() {
-                        _('status').innerHTML="Chargement annulé";
+            }
+            function errorHandler() {
+                _('status').innerHTML="Chargement échoué";
+            }
+            function abortHandler() {
+                _('status').innerHTML="Chargement annulé";
 
-                    }
-                    /*
-                    |============Add-Ajax==================|
-                    */
-                    $(document).ready(function() {
-                        $('#example').DataTable({});
-                        $('.addUser').click(function() {
-                            $('#addUser').modal({
-                                backdrop: 'static',
-                                keyboard: false
-                            });
-                        });
-
-                        $(document).on('submit', '[data-ajax-form]', function(event) {
-                            event.preventDefault();
-
-                            var form = $(this);
-                            var submit = $(this).find(':submit');
-                            if (form.data('ajax-form') !== 'submitted') {
-
-                                form.attr('data-ajax-form','submitted');
-                            }
-                            $.ajax({
-                                url: form.attr('action'),
-                                method: 'POST',
-                                data: new FormData(form[0]),
-                                beforeSend: function () {
-
-                                    $('#submit').addClass('d-flex align-items-center');
-                                    $('#submit').prop('disabled',true);
-
-
-                                $('#submit').html('<strong>Enregistrer...</strong><span class=" spinner-border spinner-border-sm ml-auto" role="status" aria-hidden="true"></span>');
-                                },
-                                complete: function () {
-
-                                    $('#submit').html('Enregistrer');
-                                    $('#submit').removeClass('d-flex align-items-center');
-                                    $('#submit').prop('disabled',false);
-
-
-                                },
-
-                                contentType:false,
-                                processData:false,
-
-                                success: function(response) {
-                                    $('#add-form')[0].reset();
-
-                                    $('[data-ajax-input]').removeClass('is-invalid');
-                                    $('[data-ajax-feedback]').html('').removeClass('d-block');
-
-
-                                    // location.reload();
-                                },
-                                error: function(response) {
-                                    // alert(response.responseJSON.message);
-                                    $('[data-ajax-input]').removeClass('is-invalid');
-                                    $('[data-ajax-feedback]').html('').removeClass('d-block');
-                                    if (response.responseJSON.hasOwnProperty('errors')) {
-                                        $.each(response.responseJSON.errors,function (key,value) {
-                                            $('[data-ajax-input="'+key + '"]').addClass('is-invalid');
-                                            $('[data-ajax-feedback="'+key + '"]').html(value[0]).addClass('d-block');
-                                        })
-                                    }
-
-                                }
-                            });
-                        });
+            }
+            /*
+            |============Add-Ajax==================|
+            */
+            $(document).ready(function() {
+                $('#example').DataTable({});
+                $('.addUser').click(function() {
+                    $('#addUser').modal({
+                        backdrop: 'static',
+                        keyboard: false
                     });
-                     /*
-                    |============Edit-Ajax==================|
-                    */
-                    function editionUser(id) {
-                            $.get('/testEdit/'+id, function name(test) {
-                                $("#userEditId").val(test.id);
-                                $("#nameUser").val(test.name);
-                                $("#firstnameUser").val(test.firstname);
-                                $("#emailUser").val(test.email);
-                                $('#editUser').modal({backdrop: 'static',keyboard: false});
+                });
+
+                $(document).on('submit', '[data-ajax-form]', function(event) {
+                    event.preventDefault();
+
+                    var form = $(this);
+                    var submit = $(this).find(':submit');
+                    if (form.data('ajax-form') !== 'submitted') {
+
+                        form.attr('data-ajax-form','submitted');
+                    }
+                    $.ajax({
+                        url: form.attr('action'),
+                        method: 'POST',
+                        data: new FormData(form[0]),
+                        beforeSend: function () {
+
+                            $('#submit').addClass('d-flex align-items-center');
+                            $('#submit').prop('disabled',true);
+
+
+                        $('#submit').html('<strong>Enregistrer...</strong><span class=" spinner-border spinner-border-sm ml-auto" role="status" aria-hidden="true"></span>');
+                        },
+                        complete: function () {
+
+                            $('#submit').html('Enregistrer');
+                            $('#submit').removeClass('d-flex align-items-center');
+                            $('#submit').prop('disabled',false);
+
+
+                        },
+
+                        contentType:false,
+                        processData:false,
+
+                        success: function(response) {
+                            $('#add-form')[0].reset();
+
+                            $('[data-ajax-input]').removeClass('is-invalid');
+                            $('[data-ajax-feedback]').html('').removeClass('d-block');
+
+
+                            // location.reload();
+                        },
+                        error: function(response) {
+                            // alert(response.responseJSON.message);
+                            $('[data-ajax-input]').removeClass('is-invalid');
+                            $('[data-ajax-feedback]').html('').removeClass('d-block');
+                            if (response.responseJSON.hasOwnProperty('errors')) {
+                                $.each(response.responseJSON.errors,function (key,value) {
+                                    $('[data-ajax-input="'+key + '"]').addClass('is-invalid');
+                                    $('[data-ajax-feedback="'+key + '"]').html(value[0]).addClass('d-block');
+                                })
+                            }
+
+                        }
+                    });
+                });
+            });
+
+        </script>
+        <script>
+                /*
+            |============Edit-Ajax==================|
+            */
+            function editionUser(id)
+            {
+                $.get('/testEdit/'+id, function name(test) {
+                    $("#userEditId").val(test.id);
+                    $("#nameUser").val(test.name);
+                    $("#firstnameUser").val(test.firstname);
+                    $("#emailUser").val(test.email);
+                    // $('#editUser').modal({backdrop: 'static',keyboard: false});
+                    $('#editUser').modal('toggle');
+                })
+            }
+
+            $('#edit-form').submit(function(event) {
+                event.preventDefault();
+                let _token=$('input[name=_token]').val();
+                let id=$("#userEditId").val();
+                let name=$("#nameUser").val();
+                let firstname=$("#firstnameUser").val();
+                let email=$("#emailUser").val();
+
+                $.ajaxSetup({
+                    headers:{
+                        'X-CSRF-TOKEN':"{{ csrf_token() }}"
+                    }
+                });
+                $.ajax({
+                    type: 'PUT',
+                    url:"{{route('update.user')}}",
+                    dataType: 'json',
+                    data: {
+                        id: id,
+                        name: name,
+                        firstname: firstname,
+                        email: email,
+                        _token:_token,
+
+                    },
+                    beforeSend: function () {
+
+                        $('#editSubmit').addClass('d-flex align-items-center');
+                        $('#editSubmit').prop('disabled',true);
+                        $('#editSubmit').html('<strong>Enregistrer les modification...</strong><span class=" spinner-border spinner-border-sm ml-auto" role="status" aria-hidden="true"></span>');
+                    },
+                    complete: function () {
+
+                        $('#editSubmit').html('Enregistrer les modification');
+                        $('#editSubmit').removeClass('d-flex align-items-center');
+                        $('#editSubmit').prop('disabled',false);
+                    },
+                    processData:true,
+
+                    success: function(response) {
+                        $('tr#sid' + response.id +' td:nth-child(2)').text(response.name);
+                        $('tr#sid' + response.id +' td:nth-child(3)').text(response.firstname);
+                        $('tr#sid' + response.id +' td:nth-child(4)').text(response.email);
+                        $('[data-edit-input]').removeClass('is-invalid');
+                        $('[data-edit-feedback]').html('').removeClass('d-block');
+                        $('#editUser').modal('toggle');
+                        $('#edit-form')[0].reset();
+                        //  location.reload();
+                    },
+                    error: function(response) {
+                            console.log(response);
+                        $('[data-edit-input]').removeClass('is-invalid');
+                        $('[data-edit-feedback]').html('').removeClass('d-block');
+                            if (response.responseJSON.hasOwnProperty('errors')) {
+                            $.each(response.responseJSON.errors,function (key,value) {
+                                $('[data-edit-input="'+key + '"]').addClass('is-invalid');
+                                $('[data-edit-feedback="'+key + '"]').html(value[0]).addClass('d-block');
                             })
                         }
-                    $(document).ready(function() {
-
-                        // $('.editUser').click(function() {
-                        //     $('#editUser').modal({
-                        //         backdrop: 'static',
-                        //         keyboard: false
-                        //     });
-
-                        //     // $("#userEditId").attr('value',$(this).data('id_edit'));
-                        //     // $("#nameUser").attr('value',$(this).data('nom_edit'));
-                        //     // $("#firstnameUser").attr('value',$(this).data('prenom_edit'));
-                        //     // $("#emailUser").attr('value',$(this).data('email_edit'));
-                        // });
-
-                        $(document).on('submit', '#edit-form', function(event) {
-                            event.preventDefault();
-                            let _token=$('input[name=_token]').val();
-                            let id=$("#userEditId").val();
-                            let name=$("#nameUser").val();
-                            let firstname=$("#firstnameUser").val();
-                            let email=$("#emailUser").val();
-
-                            $.ajaxSetup({
-                                headers:{
-                                    'X-CSRF-TOKEN':"{{ csrf_token() }}"
-                                }
-                            });
-                            $.ajax({
-                                type: 'PUT',
-                                url:"{{route('update.user')}}",
-			                    dataType: 'json',
-                                data: {
-                                    id: id,
-                                    name: name,
-                                    firstname: firstname,
-                                    email: email,
-                                    _token:_token,
-
-                                },
-                                beforeSend: function () {
-
-                                    $('#editSubmit').addClass('d-flex align-items-center');
-                                    $('#editSubmit').prop('disabled',true);
-
-
-                                $('#editSubmit').html('<strong>Enregistrer les modification...</strong><span class=" spinner-border spinner-border-sm ml-auto" role="status" aria-hidden="true"></span>');
-                                },
-                                complete: function () {
-
-                                    $('#editSubmit').html('Enregistrer les modification');
-                                    $('#editSubmit').removeClass('d-flex align-items-center');
-                                    $('#editSubmit').prop('disabled',false);
-
-
-                                },
-
-
-                                processData:true,
-
-                                success: function(response) {
-                                    $('#sid'+response.id+'td:nth-child(1)').text(response.name);
-                                    $('#sid'+response.id+'td:nth-child(2)').text(response.firstname);
-                                    $('#sid'+response.id+'td:nth-child(3)').text(response.email);
-                                    $('#edit-form')[0].reset();
-
-                                    $('[data-edit-input]').removeClass('is-invalid');
-                                    $('[data-edit-feedback]').html('').removeClass('d-block');
-
-                                    console.log(response);
-                                    // $("#userEditId").val('');
-                                    // $("#nameUser").val('');
-                                    // $("#firstnameUser").val('');
-                                    // $("#emailUser").val('');
-
-
-                                    // location.reload();
-                                },
-                                error: function(response) {
-                                     console.log(response);
-                                    $('[data-edit-input]').removeClass('is-invalid');
-                                    $('[data-edit-feedback]').html('').removeClass('d-block');
-                                        if (response.responseJSON.hasOwnProperty('errors')) {
-                                        $.each(response.responseJSON.errors,function (key,value) {
-                                            $('[data-edit-input="'+key + '"]').addClass('is-invalid');
-                                            $('[data-edit-feedback="'+key + '"]').html(value[0]).addClass('d-block');
-                                        })
-                                    }
-                                }
-                            });
-                        });
+                    }
+                });
+            });
+        </script>
+        <script>
+                /*
+            |============Delete-Ajax==================|
+            */
+            $(document).ready(function() {
+                $('.deleteUser').click(function() {
+                    $('#deleteUser').modal({
+                        backdrop: 'static',
+                        keyboard: false
                     });
-                      /*
-                    |============Delete-Ajax==================|
-                    */
-                    $(document).ready(function() {
-                        $('.deleteUser').click(function() {
-                            $('#deleteUser').modal({
-                                backdrop: 'static',
-                                keyboard: false
-                            });
-                            $("#userId").val($(this).data('id'));
+                    $("#userId").val($(this).data('id'));
 
-                        });
+                });
 
 
-                        $(document).on('submit', '#delete-form', function(e) {
-                            e.preventDefault();
-                          let id=$("#userId").val();
-                            $.ajaxSetup({
-                                headers:{
-                                    'X-CSRF-TOKEN':"{{ csrf_token() }}"
-                                }
-                            });
-                            $.ajax({
-                                type: 'POST',
-                                url: '/test/'+id+'/delete',
+                $(document).on('submit', '#delete-form', function(e) {
+                    e.preventDefault();
+                    let id=$("#userId").val();
+                    $.ajaxSetup({
+                        headers:{
+                            'X-CSRF-TOKEN':"{{ csrf_token() }}"
+                        }
+                    });
+                    $.ajax({
+                        type: 'POST',
+                        url: '/test/'+id+'/delete',
 
-                                data: {
-                                    'id': id
-                                },
-                                beforeSend: function () {
-                                    $('#delete').addClass('d-flex align-items-center');
-                                    $('#delete').prop('disabled',true);
+                        data: {
+                            'id': id
+                        },
+                        beforeSend: function () {
+                            $('#delete').addClass('d-flex align-items-center');
+                            $('#delete').prop('disabled',true);
 
-                                    $('#delete').html('<strong>Oui, supprimer...</strong><span class=" spinner-border spinner-border-sm ml-auto" role="status" aria-hidden="true"></span>');
-                                },
-                                complete: function () {
+                            $('#delete').html('<strong>Oui, supprimer...</strong><span class=" spinner-border spinner-border-sm ml-auto" role="status" aria-hidden="true"></span>');
+                        },
+                        complete: function () {
 
-                                    $('#delete').html('Oui, supprimer');
-                                    $('#delete').removeClass('d-flex align-items-center');
-                                    $('#delete').prop('disabled',false);
+                            $('#delete').html('Oui, supprimer');
+                            $('#delete').removeClass('d-flex align-items-center');
+                            $('#delete').prop('disabled',false);
 
-                                },
-                                contentType:false,
-                                processData:false,
-                                success: function(response) {
-                                    $('#userId').val('');
-                                    location.reload();
-                                },
-                                error: function($xhr, textStatus, errorThrown) {
-                                    console.log($xhr.responseJSON.message);
-                                }
-                            });
-
-                        });
+                        },
+                        contentType:false,
+                        processData:false,
+                        success: function(response) {
+                            $('#userId').val('');
+                            location.reload();
+                        },
+                        error: function($xhr, textStatus, errorThrown) {
+                            console.log($xhr.responseJSON.message);
+                        }
                     });
 
-                </script>
-
+                });
+            });
+        </script>
     @endsection
